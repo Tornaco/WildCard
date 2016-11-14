@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="dot">
+        <attr name="color" format="color"/>
+        <attr name="size" format="dimension"/>
+        <attr name="count" format="integer"/>
+        <attr name="padding" format="dimension"/>
+        <attr name="shadowSize" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="pin">
+        <attr name="key" format="string"/>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ripple color when a button is pressed in a pad. -->
+    <color name="pin_pad_button_ripple_color">#33FFFFFF</color>
+    <!-- Background color for the numeric pad. -->
+    <color name="pin_pad_numeric_background_color">#434343</color>
+    <!-- red -->
+    <color name="red">#e84e40</color>
+    <!-- pink -->
+    <color name="pink">#e91e63</color>
+    <!-- purple -->
+    <color name="purple">#9c27b0</color>
+    <!-- deep_purple -->
+    <color name="deep_purple">#673ab7</color>
+    <!-- indigo -->
+    <color name="indigo">#3f51b5</color>
+    <color name="blue">#455ede</color>
+    <!-- light_blue -->
+    <color name="light_blue">#29b6f6</color>
+    <!-- cyan -->
+    <color name="cyan">#26c6da</color>
+    <!-- teal -->
+    <color name="teal">#009688</color>
+    <!-- green -->
+    <color name="green">#2baf2b</color>
+    <!-- light_green -->
+    <color name="light_green">#689f38</color>
+    <!-- lime -->
+    <color name="lime">#9e9d24</color>
+    <!-- yellow -->
+    <color name="yellow">#f9a825</color>
+    <!-- amber -->
+    <color name="amber">#ff6f00</color>
+    <!-- orange -->
+    <color name="orange">#ff6d00</color>
+    <!-- deep_orange -->
+    <color name="deep_orange">#bf360c</color>
+    <!-- brown -->
+    <color name="brown">#6d4c41</color>
+    <!-- grey -->
+    <color name="grey">#fafafa</color>
+    <color name="grey_200">#eeeeee</color>
+    <color name="grey_300">#e0e0e0</color>
+    <color name="grey_400">#bdbdbd</color>
+    <color name="grey_500">#9e9e9e</color>
+    <color name="grey_600">#757575</color>
+    <color name="grey_700">#616161</color>
+    <color name="grey_800">#424242</color>
+    <color name="grey_900">#212121</color>
+    <!-- <color name="grey_1000">#000000</color> -->
+    <color name="black">#000000</color>
+    <!-- <color name="grey_1000">#ffffff</color> -->
+    <color name="white">#ffffff</color>
+</resources>

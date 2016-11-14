@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dev.nick.app.pinlock.widget.PinPadLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pin="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pad_numeric"
+    style="@style/PinPadLayoutStyle.Numeric"
+    android:background="@color/pin_pad_numeric_background_color"
+    android:columnCount="3"
+    android:rowCount="4">
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_7"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_7"
+        pin:key="SEVEN" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_8"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_8"
+        pin:key="EIGHT" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_9"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_9"
+        pin:key="NINE" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_4"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_4"
+        pin:key="FOUR" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_5"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_5"
+        pin:key="FIVE" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_6"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_6"
+        pin:key="SIX" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_1"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_1"
+        pin:key="ONE" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_2"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_2"
+        pin:key="TWO" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_3"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_3"
+        pin:key="THREE" />
+
+    <Button
+        android:id="@+id/backspace"
+        android:text="@android:string/ok"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:textSize="@dimen/text_size_large" />
+
+    <dev.nick.app.pinlock.widget.DigitButton
+        android:id="@+id/digit_0"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@string/digit_0"
+        pin:key="ZERO" />
+
+    <Button
+        android:id="@+id/okay"
+        style="@style/PinPadButtonStyle.Numeric"
+        android:text="@android:string/ok"
+        android:textSize="@dimen/text_size_large" />
+
+</dev.nick.app.pinlock.widget.PinPadLayout>
