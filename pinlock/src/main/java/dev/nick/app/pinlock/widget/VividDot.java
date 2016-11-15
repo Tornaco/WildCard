@@ -3,11 +3,13 @@ package dev.nick.app.pinlock.widget;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -30,7 +32,7 @@ public class VividDot extends View {
     private int mDotPadding;
     private float mCurrDotScale;
     private int mCurrDotCt;
-    private InputOpinion mInputOp = InputOpinion.None;
+    private InputMode mInputOp = InputMode.None;
     private int mMaxDotCount;
     private List<Dot> mDots;
     private int mWidth, mHeight;
@@ -51,6 +53,7 @@ public class VividDot extends View {
         parseAttrAndInit(context, attrs);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public VividDot(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         parseAttrAndInit(context, attrs);
@@ -66,7 +69,7 @@ public class VividDot extends View {
         mRadius = array.getDimensionPixelSize(R.styleable.dot_size, 15);
         mDotPadding = array.getDimensionPixelSize(R.styleable.dot_padding, 30);
         int shadowRadius = array.getDimensionPixelSize(R.styleable.dot_shadowSize, 3);
-        mMaxDotCount = array.getInteger(R.styleable.dot_count, 6);
+        mMaxDotCount = array.getInteger(R.styleable.dot_count, 4);
         array.recycle();
 
         mDotPaint = new Paint();
@@ -101,7 +104,7 @@ public class VividDot extends View {
 
         for (Dot d : mDots) {
             boolean draw = (d.index < mCurrDotCt)
-                    || (d.index == mCurrDotCt && mInputOp == InputOpinion.Remove);
+                    || (d.index == mCurrDotCt && mInputOp == InputMode.Remove);
             if (draw) {
                 drawDot(canvas, startX, startY, d);
             }
@@ -109,8 +112,8 @@ public class VividDot extends View {
     }
 
     private void drawDot(Canvas canvas, float xStart, float yStart, Dot dot) {
-        boolean animate = (dot.index == mCurrDotCt - 1 && mInputOp == InputOpinion.Add)
-                || (dot.index == mCurrDotCt && mInputOp == InputOpinion.Remove) || (mInputOp == InputOpinion.Clear);
+        boolean animate = (dot.index == mCurrDotCt - 1 && mInputOp == InputMode.Add)
+                || (dot.index == mCurrDotCt && mInputOp == InputMode.Remove) || (mInputOp == InputMode.Clear);
         if (animate) {
             canvas.drawCircle(xStart + dot.index * (mRadius * 2 + mDotPadding), yStart, mRadius * mCurrDotScale, mDotPaint);
         } else {
@@ -132,7 +135,7 @@ public class VividDot extends View {
             }
             return false;
         }
-        mInputOp = InputOpinion.Add;
+        mInputOp = InputMode.Add;
         Dot dot = new Dot(mCurrDotCt, key);
         mDots.add(dot);
         upDotCount();
@@ -148,7 +151,7 @@ public class VividDot extends View {
      */
     public synchronized boolean removeLastDigit() {
         if (mCurrDotCt == 0) return false;
-        mInputOp = InputOpinion.Remove;
+        mInputOp = InputMode.Remove;
         downDotCount();
         startDotAnimator();
         return true;
@@ -158,7 +161,7 @@ public class VividDot extends View {
      * @return True if successfully cleared the dots.
      */
     public synchronized boolean clearDots() {
-        mInputOp = InputOpinion.Clear;
+        mInputOp = InputMode.Clear;
         mCurrDotCt = 0;
         mDots.clear();
         startDotAnimator();
@@ -168,12 +171,12 @@ public class VividDot extends View {
     private void startDotAnimator() {
         Logger.i("startDotAnimator..", getClass());
         ValueAnimator v;
-        if (mInputOp == InputOpinion.Add)
+        if (mInputOp == InputMode.Add)
             v = ValueAnimator.ofFloat(0f, 1f);
         else {
             v = ValueAnimator.ofFloat(1f, 0f);
         }
-        long duration = mInputOp == InputOpinion.Clear ? 300 : 100;
+        long duration = mInputOp == InputMode.Clear ? 300 : 100;
         v.setDuration(duration);
         v.setInterpolator(new LinearInterpolator());
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -200,7 +203,9 @@ public class VividDot extends View {
      * Called by the ObjectAnimator.
      */
     public void setColor(int colorId) {
-        setBackground(getResources().getDrawable(colorId));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            setBackground(getResources().getDrawable(colorId));//FIXME
+        }
     }
 
     /**
@@ -223,7 +228,6 @@ public class VividDot extends View {
                             @SuppressLint("ResourceAsColor")
                             @Override
                             public void onAnimationEnd(Animator animation) {
-                                setColor(R.color.green);
                                 if (clearDots) clearDots();
                             }
 
@@ -251,22 +255,22 @@ public class VividDot extends View {
         return sb.toString();
     }
 
-    enum InputOpinion {
+    enum InputMode {
         Add,
         Remove,
         Clear,
         None
     }
 
-    public static enum DisplayMode {
+    public enum DisplayMode {
         Correct,
         Wrong
     }
 
     class Dot {
-
         int index;
         PinKey key;
+
         Dot(int index, PinKey key) {
             this.index = index;
             this.key = key;

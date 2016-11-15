@@ -1,7 +1,9 @@
 package dev.nick.app.pinlock.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.Button;
 
@@ -28,6 +30,7 @@ public class DigitButton extends Button {
         readKeyFromAttrs(context, attrs);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public DigitButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         readKeyFromAttrs(context, attrs);
@@ -38,6 +41,7 @@ public class DigitButton extends Button {
         String keyStr = array.getString(R.styleable.pin_key);
         if (keyStr != null)
             mStandFor = SecurityUtils.text2PinKey(keyStr);
+        array.recycle();
         Logger.d("readKeyFromAttrs: key = " + mStandFor.toString(), getClass());
     }
 

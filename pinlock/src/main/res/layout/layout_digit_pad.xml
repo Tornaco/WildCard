@@ -3,7 +3,7 @@
     xmlns:pin="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pad_numeric"
     style="@style/PinPadLayoutStyle.Numeric"
-    android:background="@color/pin_pad_numeric_background_color"
+    android:background="@color/white"
     android:columnCount="3"
     android:rowCount="4">
 
@@ -61,11 +61,10 @@
         android:text="@string/digit_3"
         pin:key="THREE" />
 
-    <Button
+    <ImageButton
         android:id="@+id/backspace"
-        android:text="@android:string/ok"
         style="@style/PinPadButtonStyle.Numeric"
-        android:textSize="@dimen/text_size_large" />
+        android:src="@drawable/ic_edit_back" />
 
     <dev.nick.app.pinlock.widget.DigitButton
         android:id="@+id/digit_0"
@@ -73,10 +72,9 @@
         android:text="@string/digit_0"
         pin:key="ZERO" />
 
-    <Button
+    <ImageButton
         android:id="@+id/okay"
         style="@style/PinPadButtonStyle.Numeric"
-        android:text="@android:string/ok"
-        android:textSize="@dimen/text_size_large" />
+        android:src="@drawable/ic_edit_ok" />
 
 </dev.nick.app.pinlock.widget.PinPadLayout>

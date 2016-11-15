@@ -12,4 +12,10 @@ public interface IProviderService<T> {
     void remove(@NonNull WildPackage wildPackage);
 
     List<T> read();
+
+    void observe(@NonNull Observer observer);
+
+    interface Observer {
+        void onChange();
+    }
 }

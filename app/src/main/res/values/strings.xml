@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">WildCard</string>
+    <string name="app_name">Wildcard</string>
     <string name="action_settings">Settings</string>
+    <string name="action_remove">Remove</string>
+    <string name="title_activity_package_picker">Picker</string>
+    <string name="app_installed">Installed</string>
+    <string name="app_system">System</string>
 </resources>

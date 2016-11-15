@@ -12,7 +12,7 @@ import android.view.ViewGroup;
  */
 public class PinPadLayout extends ViewGroup {
 
-    public static enum PinPadMode {
+    public enum PinPadMode {
         Record,
         Check
     }

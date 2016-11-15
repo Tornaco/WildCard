@@ -9,8 +9,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-public class PackageProvider extends ContentProvider {
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
+@SuppressWarnings("ConstantConditions")
+public class PackageProvider extends ContentProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -24,10 +27,12 @@ public class PackageProvider extends ContentProvider {
     }
 
     private SqlHelper dbOpenHelper;
+    private Logger mLogger;
 
     @Override
     public boolean onCreate() {
         this.dbOpenHelper = new SqlHelper(this.getContext());
+        this.mLogger = LoggerManager.getLogger(getClass());
         return false;
     }
 
@@ -73,32 +78,37 @@ public class PackageProvider extends ContentProvider {
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
         switch (MATCHER.match(uri)) {
             case PKGS:
+                mLogger.debug("PKGS:" + uri);
                 long rowid = db.insert(SqlHelper.TABLE_NAME, null, values);
                 Uri insertUri = ContentUris.withAppendedId(uri, rowid);
                 this.getContext().getContentResolver().notifyChange(uri, null);
                 return insertUri;
 
             default:
-                throw new IllegalArgumentException("Unkwon Uri:" + uri.toString());
+                throw new IllegalArgumentException("Unknown Uri:" + uri.toString());
         }
     }
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
-        int count = 0;
+        int count;
         switch (MATCHER.match(uri)) {
             case PKGS:
+                mLogger.debug("PKGS:" + uri);
                 count = db.delete(SqlHelper.TABLE_NAME, selection, selectionArgs);
+                this.getContext().getContentResolver().notifyChange(uri, null);
                 return count;
 
             case PKG:
+                mLogger.debug("PKG:" + uri);
                 long id = ContentUris.parseId(uri);
                 String where = "_id=" + id;
                 if (selection != null && !"".equals(selection)) {
                     where = selection + " and " + where;
                 }
                 count = db.delete(SqlHelper.TABLE_NAME, where, selectionArgs);
+                this.getContext().getContentResolver().notifyChange(uri, null);
                 return count;
 
             default:
@@ -114,6 +124,7 @@ public class PackageProvider extends ContentProvider {
         switch (MATCHER.match(uri)) {
             case PKGS:
                 count = db.update(SqlHelper.TABLE_NAME, values, selection, selectionArgs);
+                this.getContext().getContentResolver().notifyChange(uri, null);
                 return count;
             case PKG:
                 long id = ContentUris.parseId(uri);
@@ -122,6 +133,7 @@ public class PackageProvider extends ContentProvider {
                     where = selection + " and " + where;
                 }
                 count = db.update(SqlHelper.TABLE_NAME, values, where, selectionArgs);
+                this.getContext().getContentResolver().notifyChange(uri, null);
                 return count;
             default:
                 throw new IllegalArgumentException("Unknown Uri:" + uri.toString());

@@ -7,62 +7,86 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.app.wildcard.LockActivity;
+import dev.nick.app.pinlock.PinLockStub;
+import dev.nick.app.wildcard.WildcardApp;
 import dev.nick.app.wildcard.app.AppCompat;
+import dev.nick.app.wildcard.bean.WildPackage;
+import dev.nick.app.wildcard.repo.IProviderService;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class GuardService extends Service {
 
-    private final static int LOOPHANDLER = 0;
-    private static long cycleTime = 1000;
-    private final String TAG = "LockService";
+    private final static int EVENT_TICK = 0x1;
+    private final static int EVENT_UPDATE = 0x2;
+
+    private static long cycleTime = 300;
+
     private Handler mHandler = null;
-    private HandlerThread handlerThread = null;
     private boolean isUnLockActivity = false;
+
+    private List<WildPackage> mWorkingList;
+
+    private Logger mLogger;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        handlerThread = new HandlerThread("count_thread");
+
+        mLogger = LoggerManager.getLogger(getClass());
+
+        final WildcardApp app = (WildcardApp) getApplication();
+        mWorkingList = app.getProviderService().read();
+
+        app.getProviderService().observe(
+                new IProviderService.Observer() {
+                    @Override
+                    public void onChange() {
+                        mHandler.removeMessages(EVENT_UPDATE);
+                        mHandler.sendEmptyMessage(EVENT_UPDATE);
+                    }
+                }
+        );
+
+        HandlerThread handlerThread = new HandlerThread("event_thread");
         handlerThread.start();
 
         mHandler = new Handler(handlerThread.getLooper()) {
             public void dispatchMessage(android.os.Message msg) {
                 switch (msg.what) {
-                    case LOOPHANDLER:
-                        Log.i(TAG, "do something..." + (System.currentTimeMillis() / 1000));
+                    case EVENT_TICK:
                         if (isLockName() && !isUnLockActivity) {
-                            Log.i(TAG, "locking...");
-                            Intent intent = new Intent(GuardService.this, LockActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            mLogger.debug("Locking!");
+                            new PinLockStub(getApplicationContext()).lock();
                             isUnLockActivity = true;
                         }
                         break;
+                    case EVENT_UPDATE:
+                        mWorkingList = app.getProviderService().read();
+                        break;
                 }
-                mHandler.sendEmptyMessageDelayed(LOOPHANDLER, cycleTime);
+                mHandler.sendEmptyMessageDelayed(EVENT_TICK, cycleTime);
             }
         };
-        mHandler.sendEmptyMessage(LOOPHANDLER);
+        mHandler.sendEmptyMessage(EVENT_TICK);
     }
 
     private boolean isLockName() {
-
         String packageName = AppCompat.from(this).getTopPackage();
 
         if (getHomes().contains(packageName)) {
             isUnLockActivity = false;
         }
-        Log.v("LockService", "packageName == " + packageName);
 
-        if ("com.android.settings".equals(packageName)) {
-            return true;
-        }
-        return false;
+        mLogger.verbose(packageName);
+
+        WildPackage wildPackage = new WildPackage();
+        wildPackage.setPkgName(packageName);
+        return mWorkingList.contains(wildPackage);
     }
 
     private List<String> getHomes() {

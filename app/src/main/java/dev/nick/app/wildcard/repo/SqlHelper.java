@@ -18,7 +18,7 @@ class SqlHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE "
                 + TABLE_NAME
-                + " (_id integer primary key autoincrement, pkgName TEXT, accessTimes INTEGER, lastAccessTime LONG)");
+                + " (_id integer primary key autoincrement, pkgName TEXT, name TEXT, accessTimes INTEGER, lastAccessTime LONG)");
     }
 
     @Override

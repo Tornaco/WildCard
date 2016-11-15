@@ -61,7 +61,7 @@ public class ViewAnimatorUtil {
         anim.start();
     }
 
-    public static void circularSHow(final View view) {
+    public static void circularSHow(final View view, final Runnable runnable) {
         if (view.getVisibility() == View.VISIBLE || view.getWindowToken() == null) return;
         // get the center for the clipping circle
         int cx = (view.getLeft() + view.getRight()) / 2;
@@ -79,6 +79,12 @@ public class ViewAnimatorUtil {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (runnable != null) runnable.run();
             }
         });
 
