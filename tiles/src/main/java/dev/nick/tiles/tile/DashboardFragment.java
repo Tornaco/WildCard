@@ -103,6 +103,11 @@ public class DashboardFragment extends Fragment {
             mDashboard.addView(categoryView);
         }
         long delta = System.currentTimeMillis() - start;
+        onUIBuilt();
+    }
+
+    protected void onUIBuilt() {
+        // None
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

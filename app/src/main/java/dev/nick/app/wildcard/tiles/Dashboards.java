@@ -16,14 +16,14 @@ import dev.nick.tiles.tile.DashboardFragment;
 
 public class Dashboards extends DashboardFragment implements PackageTile.OnCheckedChangeListener {
 
-    private DataCallback mDataCallback;
+    private Callback mCallback;
 
     private List<WildPackage> mWorkingList;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mDataCallback = (DataCallback) getActivity();
+        mCallback = (Callback) getActivity();
         setHasOptionsMenu(true);
     }
 
@@ -33,7 +33,7 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
 
         Category third = new Category();
         third.titleRes = R.string.app_installed;
-        for (WildPackage p : mDataCallback.getInstalledPackages()) {
+        for (WildPackage p : mCallback.getInstalledPackages()) {
             PackageTile packageTile = new PackageTile(getActivity(), p, this);
             third.addTile(packageTile);
         }
@@ -41,7 +41,7 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
 
         Category system = new Category();
         system.titleRes = R.string.app_system;
-        for (WildPackage p : mDataCallback.getSystemPackages()) {
+        for (WildPackage p : mCallback.getSystemPackages()) {
             PackageTile packageTile = new PackageTile(getActivity(), p, this);
             system.addTile(packageTile);
         }
@@ -56,8 +56,14 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mDataCallback.apply(mWorkingList);
+        mCallback.apply(mWorkingList);
         return true;
+    }
+
+    @Override
+    protected void onUIBuilt() {
+        super.onUIBuilt();
+        mCallback.onUIReady();
     }
 
     @Override
@@ -75,12 +81,14 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
         }
     }
 
-    public interface DataCallback {
+    public interface Callback {
         List<WildPackage> getInstalledPackages();
 
         List<WildPackage> getSystemPackages();
 
         void apply(List<WildPackage> workingList);
+
+        void onUIReady();
     }
 
 }

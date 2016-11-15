@@ -15,7 +15,7 @@ import java.util.List;
 import dev.nick.app.wildcard.bean.WildPackage;
 import dev.nick.app.wildcard.tiles.Dashboards;
 
-public class PackagePickerActivity extends TransactionSafeActivity implements Dashboards.DataCallback {
+public class PackagePickerActivity extends TransactionSafeActivity implements Dashboards.Callback {
 
     private List<WildPackage> mInstalledPackages, mSystemPackages, mWildPackages;
 
@@ -32,11 +32,6 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Da
         new AsyncTask<Void, Void, Void>() {
 
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
-
-            @Override
             protected Void doInBackground(Void... voids) {
                 readPackages();
                 return null;
@@ -45,7 +40,6 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Da
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                findViewById(R.id.progress).setVisibility(View.GONE);
                 placeFragment(R.id.container, new Dashboards(), null, false);
             }
         }.execute();
@@ -111,5 +105,10 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Da
             wildcardApp.getProviderService().add(p);
         }
         finish();
+    }
+
+    @Override
+    public void onUIReady() {
+        findViewById(R.id.progress).setVisibility(View.GONE);
     }
 }
