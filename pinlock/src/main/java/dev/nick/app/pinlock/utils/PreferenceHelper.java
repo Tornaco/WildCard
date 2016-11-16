@@ -22,11 +22,11 @@ public class PreferenceHelper {
         mSpre.edit().putString(VaultSettings.PRE_KEY_PWD, pwd).apply();
     }
 
-    public boolean isVaultFirstRun() {
+    public boolean isPwdSet() {
         return mSpre.getBoolean(VaultSettings.APP_FIRST_RUN, true);
     }
 
-    public void markHasRun() {
+    public void onPwdSet() {
         mSpre.edit().putBoolean(VaultSettings.APP_FIRST_RUN, false).apply();
     }
 }

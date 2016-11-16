@@ -16,8 +16,16 @@
         android:id="@+id/display_layout"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:background="@color/blue"
+        android:background="@color/primary"
         android:elevation="6dp">
+
+        <View
+            android:id="@+id/liner"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent" />
 
         <dev.nick.app.pinlock.widget.VividDot
             android:id="@+id/dot_area"
@@ -31,17 +39,18 @@
             android:id="@+id/logo"
             android:layout_width="@dimen/logo_size"
             android:layout_height="@dimen/logo_size"
+            android:layout_above="@+id/liner"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/common_vertical_margin"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
             android:id="@+id/tip_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/logo"
+            android:layout_below="@+id/liner"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/common_vertical_margin"
+            android:layout_marginTop="@dimen/common_vertical_margin_middle"
             android:text="@string/tips_enter_pin"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/white" />

@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -31,6 +33,7 @@ public class ViewAnimatorUtil {
         animation.start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void circularHide(final View view, Animator.AnimatorListener listener) {
         if (view.getWindowToken() == null) return;
 
@@ -61,8 +64,9 @@ public class ViewAnimatorUtil {
         anim.start();
     }
 
-    public static void circularSHow(final View view, final Runnable runnable) {
-        if (view.getVisibility() == View.VISIBLE || view.getWindowToken() == null) return;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static void circularShow(final View view, final Runnable runnable) {
+        view.setVisibility(View.INVISIBLE);
         // get the center for the clipping circle
         int cx = (view.getLeft() + view.getRight()) / 2;
         int cy = (view.getTop() + view.getBottom()) / 2;

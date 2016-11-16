@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     tools:context="dev.nick.app.wildcard.PackagePickerActivity">
 
-    <include layout="@layout/content_package_picker" />
+    <include layout="@layout/common_container" />
 
     <ProgressBar
         android:id="@+id/progress"

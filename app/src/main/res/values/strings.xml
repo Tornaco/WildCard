@@ -3,6 +3,13 @@
     <string name="action_settings">Settings</string>
     <string name="action_remove">Remove</string>
     <string name="title_activity_package_picker">Picker</string>
+    <string name="app_suggestion">Suggested</string>
     <string name="app_installed">Installed</string>
     <string name="app_system">System</string>
+
+    <string name="category_view">UI</string>
+    <string name="settings_grid">Grid view</string>
+
+    <string name="title_get_status">Permissions requirement</string>
+    <string name="message_get_status">We have to get access of usage, now we will navigate to the Settings page, please give the <b>usage access</b> to <b>Wildcard</b></string>
 </resources>

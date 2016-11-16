@@ -1,18 +1,20 @@
 package dev.nick.app.pinlock;
 
 import android.animation.Animator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import dev.nick.app.lock.Locker;
-import dev.nick.app.pinlock.R;
 import dev.nick.app.pinlock.secure.PinKey;
 import dev.nick.app.pinlock.secure.VividDotListener;
 import dev.nick.app.pinlock.utils.Logger;
@@ -24,16 +26,20 @@ import dev.nick.app.pinlock.widget.VividDot;
 import static android.content.Context.WINDOW_SERVICE;
 
 
-public class PinLockStub implements VividDotListener, Locker {
+public class PinLockStub implements VividDotListener {
 
     private PreferenceHelper mPrefHelper;
 
     private RelativeLayout mPinLayout;
     private VividDot mDotArea;
     private TextView mTipView;
+    private ImageView mLogo;
     private String mLastInputPwd;
 
     private Context mContext;
+
+    private LockInfo mInfo;
+    private Listener mListener;
 
     private View.OnClickListener mButtonClickListener = new View.OnClickListener() {
         @Override
@@ -54,8 +60,10 @@ public class PinLockStub implements VividDotListener, Locker {
         }
     };
 
-    public PinLockStub(Context context) {
+    public PinLockStub(Context context, LockInfo info, Listener listener) {
         this.mContext = context;
+        this.mInfo = info;
+        this.mListener = listener;
         this.mPrefHelper = new PreferenceHelper(mContext);
     }
 
@@ -65,8 +73,10 @@ public class PinLockStub implements VividDotListener, Locker {
                     .inflate(R.layout.layout_pin_pad, null, false);
             mDotArea = getView(mPinLayout, R.id.dot_area);
             mTipView = getView(mPinLayout, R.id.tip_view);
+            mLogo = getView(mPinLayout, R.id.logo);
+            mLogo.setImageDrawable(mInfo.icon);
             mDotArea.setListener(this);
-            // set listener for all buttons ugly.
+            // set mListener for all buttons ugly.
             getView(mPinLayout, R.id.digit_9).setOnClickListener(mButtonClickListener);
             getView(mPinLayout, R.id.digit_8).setOnClickListener(mButtonClickListener);
             getView(mPinLayout, R.id.digit_7).setOnClickListener(mButtonClickListener);
@@ -86,11 +96,15 @@ public class PinLockStub implements VividDotListener, Locker {
                 }
             });
         }
-        if (mPrefHelper.isVaultFirstRun()) {
+        if (mPrefHelper.isPwdSet()) {
             setTipText(R.string.tips_pin_choose, 0);
         } else {
             setTipText(R.string.tips_enter_pin, 0);
         }
+    }
+
+    public String getStoredPwd() {
+        return mPrefHelper.getStoredPwd();
     }
 
     /**
@@ -112,15 +126,24 @@ public class PinLockStub implements VividDotListener, Locker {
                 PixelFormat.TRANSLUCENT);
         final WindowManager windowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
         windowManager.addView(mPinLayout, params);
-        if (animate) {
-            ViewAnimatorUtil.circularSHow(mPinLayout, new Runnable() {
+        if (animate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPinLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
-                public void run() {
+                public void onViewAttachedToWindow(View view) {
+                    ViewAnimatorUtil.circularShow(mPinLayout, new Runnable() {
+                        @Override
+                        public void run() {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View view) {
 
                 }
             });
-        } else {
-            mPinLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -132,7 +155,7 @@ public class PinLockStub implements VividDotListener, Locker {
     private synchronized void removePinView(boolean animate) {
         disableOkayBtn();
         final WindowManager windowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
-        if (animate) {
+        if (animate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ViewAnimatorUtil.circularHide(mPinLayout, new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
@@ -141,9 +164,8 @@ public class PinLockStub implements VividDotListener, Locker {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    enableOkayBtn();
                     windowManager.removeView(mPinLayout);
-                    onPinCorrect();
+                    mListener.onDismiss();
                 }
 
                 @Override
@@ -158,6 +180,7 @@ public class PinLockStub implements VividDotListener, Locker {
             });
         } else {
             windowManager.removeView(mPinLayout);
+            mListener.onDismiss();
         }
 
     }
@@ -172,7 +195,7 @@ public class PinLockStub implements VividDotListener, Locker {
             return;
         }
         Logger.i("onOkayClicked, input = " + input, getClass());
-        if (mPrefHelper.isVaultFirstRun()) {
+        if (mPrefHelper.isPwdSet()) {
             if (mLastInputPwd == null) {
                 mLastInputPwd = input;
                 mDotArea.clearDots();
@@ -216,7 +239,7 @@ public class PinLockStub implements VividDotListener, Locker {
 
     private void onPinCodeSaved(String pin) {
         Logger.i("onPinCodeSaved: " + pin, getClass());
-        mPrefHelper.markHasRun();
+        mPrefHelper.onPwdSet();
     }
 
     /**
@@ -292,13 +315,30 @@ public class PinLockStub implements VividDotListener, Locker {
         return (T) root.findViewById(id);
     }
 
-    @Override
     public void lock() {
-        addPinView(true);
+        addPinView(false);
+        mListener.onShown();
     }
 
-    @Override
     public void unLock() {
         removePinView(true);
+        mListener.onDismiss();
+    }
+
+    public interface Listener {
+        void onShown();
+
+        void onDismiss();
+    }
+
+    public static class LockInfo {
+
+        Drawable icon;
+        String title;
+
+        public LockInfo(String title, Drawable icon) {
+            this.icon = icon;
+            this.title = title;
+        }
     }
 }

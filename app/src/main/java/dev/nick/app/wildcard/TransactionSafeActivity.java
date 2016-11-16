@@ -47,10 +47,10 @@ public class TransactionSafeActivity extends AppCompatActivity {
 
         if (!animate) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(containerId, f).commit();
+                    .replace(containerId, f).commitAllowingStateLoss();
         } else {
             getSupportFragmentManager().beginTransaction()
-                    .replace(containerId, f).commit();
+                    .replace(containerId, f).commitAllowingStateLoss();
         }
         mShowingFragment = f;
         return true;

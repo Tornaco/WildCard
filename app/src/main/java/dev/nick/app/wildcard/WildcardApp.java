@@ -17,7 +17,7 @@ public class WildcardApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        LoggerManager.setDebugLevel(Log.DEBUG);
+        LoggerManager.setDebugLevel(Log.VERBOSE);
         LoggerManager.setTagPrefix("WildcardApp");
         mProviderService = new ProviderService(this);
         mProviderService.observe(new IProviderService.Observer() {

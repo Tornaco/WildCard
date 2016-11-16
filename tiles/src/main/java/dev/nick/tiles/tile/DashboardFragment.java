@@ -26,7 +26,12 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        buildUI(getActivity());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buildUI(getActivity());
+            }
+        });
     }
 
     @Override

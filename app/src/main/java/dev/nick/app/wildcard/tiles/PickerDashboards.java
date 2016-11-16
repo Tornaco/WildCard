@@ -14,7 +14,7 @@ import dev.nick.logger.LoggerManager;
 import dev.nick.tiles.tile.Category;
 import dev.nick.tiles.tile.DashboardFragment;
 
-public class Dashboards extends DashboardFragment implements PackageTile.OnCheckedChangeListener {
+public class PickerDashboards extends DashboardFragment implements PackageTile.OnCheckedChangeListener {
 
     private Callback mCallback;
 
@@ -30,6 +30,14 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
     @Override
     protected void onCreateDashCategories(List<Category> categories) {
         super.onCreateDashCategories(categories);
+
+        Category suggestion = new Category();
+        suggestion.titleRes = R.string.app_suggestion;
+        for (WildPackage p : mCallback.getSuggestionList()) {
+            PackageTile packageTile = new PackageTile(getActivity(), p, this);
+            suggestion.addTile(packageTile);
+        }
+        categories.add(suggestion);
 
         Category third = new Category();
         third.titleRes = R.string.app_installed;
@@ -85,6 +93,8 @@ public class Dashboards extends DashboardFragment implements PackageTile.OnCheck
         List<WildPackage> getInstalledPackages();
 
         List<WildPackage> getSystemPackages();
+
+        List<WildPackage> getSuggestionList();
 
         void apply(List<WildPackage> workingList);
 

@@ -40,7 +40,7 @@ public class ProviderService implements IProviderService<WildPackage> {
         values.put("accessTimes", wildPackage.getAccessTimes());
         values.put("lastAccessTime", wildPackage.getLastAccessTime());
         Uri uri = contentResolver.insert(insertUri, values);
-        mLogger.debug("inserted uri:" + uri);
+        mLogger.verbose("inserted uri:" + uri);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ProviderService implements IProviderService<WildPackage> {
         Uri uri = Uri.parse("content://dev.nick.app.wildcard.packageProvider/pkg");
         String where = "_id=" + id;
         int cnt = contentResolver.delete(uri, where, null);
-        mLogger.debug("removed count:" + cnt);
+        mLogger.verbose("removed count:" + cnt);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ProviderService implements IProviderService<WildPackage> {
                 }
                 wildPackage.setName(cursor.getString(cursor.getColumnIndex("name")));
                 out.add(wildPackage);
-                mLogger.info("Adding to out:" + wildPackage);
+                mLogger.verbose("Adding to out:" + wildPackage);
             } while (cursor.moveToNext());
         }
         return out;
