@@ -1,15 +1,44 @@
 package dev.nick.app.wildcard;
 
 import android.annotation.TargetApi;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import dev.nick.app.wildcard.repo.SettingsProvider;
+import dev.nick.app.wildcard.utils.ColorUtils;
+
 public class TransactionSafeActivity extends AppCompatActivity {
 
     protected Fragment mShowingFragment;
+
+    private int themeColor = -1;
+
+    public int getThemeColor() {
+        return themeColor;
+    }
+
+    protected void applyTheme() {
+        final int nowColor = SettingsProvider.get().themeColor(getApplicationContext());
+        if (themeColor > 0 && themeColor == nowColor) {
+            return;
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                themeColor = nowColor;
+                int themeColorDark = ColorUtils.colorBurn(themeColor);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getWindow().setStatusBarColor(themeColorDark);
+                }
+                //noinspection ConstantConditions
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(themeColor));
+            }
+        });
+    }
 
     /**
      * Show fragment page by replace the given containerId, if you have data to set

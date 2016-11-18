@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import dev.nick.app.wildcard.bean.WildPackage;
+import dev.nick.app.wildcard.service.SharedExecutor;
 import dev.nick.app.wildcard.tiles.PickerDashboards;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -37,9 +38,12 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Pi
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         mLogger = LoggerManager.getLogger(getClass());
+
+        applyTheme();
 
         setContentView(R.layout.activity_package_picker);
 
@@ -58,7 +62,7 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Pi
                 super.onPostExecute(aVoid);
                 placeFragment(R.id.container, new PickerDashboards(), null, true);
             }
-        }.execute();
+        }.executeOnExecutor(SharedExecutor.get().getService());
     }
 
     void readPackages() {
@@ -97,6 +101,13 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Pi
 
             if (wildPackages.contains(tmpInfo)) {
                 mLogger.info("Ignored in wild list:" + tmpInfo.getName());
+                continue;
+            }
+
+            boolean enabled = packageInfo.applicationInfo.enabled;
+
+            if (!enabled) {
+                mLogger.info("Ignored no enabled:" + tmpInfo.getName());
                 continue;
             }
 
@@ -188,7 +199,7 @@ public class PackagePickerActivity extends TransactionSafeActivity implements Pi
                     }
                     return null;
                 }
-            }.execute();
+            }.executeOnExecutor(SharedExecutor.get().getService());
         }
     }
 

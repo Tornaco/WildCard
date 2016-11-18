@@ -12,11 +12,6 @@ import android.view.ViewGroup;
  */
 public class PinPadLayout extends ViewGroup {
 
-    public enum PinPadMode {
-        Record,
-        Check
-    }
-
     private int mRowCount;
     private int mColumnCount;
 
@@ -107,6 +102,11 @@ public class PinPadLayout extends ViewGroup {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+    }
+
+    public enum PinPadMode {
+        Record,
+        Check
     }
 }
 

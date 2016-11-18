@@ -2,7 +2,7 @@
 <resources>
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
-    <color name="primary_light">#BBDEFB</color>
+    <color name="primary_light">#802196F3</color>
     <color name="accent">#FF4081</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
@@ -15,9 +15,14 @@
     <color name="material_yellow">#ffFFEB3B</color>
 
     <array name="material_ringers">
-        <item>#FFFF0000</item>
-        <item>#FF00FF00</item>
-        <item>#FF0000FF</item>
+        <item>#ffF44336</item>
+        <item>#ff4CAF50</item>
+        <item>#ff03A9F4</item>
         <item>#ffFFEB3B</item>
+        <item>#00796B</item>
+        <item>#757575</item>
+        <item>#FF4081</item>
+        <item>#795548</item>
+        <item>#D32F2F</item>
     </array>
 </resources>

@@ -1,1 +1,1 @@
-include ':app', ':logger', ':pinlock', ':lock', ':tiles'
+include ':app', ':logger', ':pinlock', ':lock', ':tiles', ':htmlDialog'

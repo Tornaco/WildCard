@@ -66,7 +66,6 @@ public class ViewAnimatorUtil {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void circularShow(final View view, final Runnable runnable) {
-        view.setVisibility(View.INVISIBLE);
         // get the center for the clipping circle
         int cx = (view.getLeft() + view.getRight()) / 2;
         int cy = (view.getTop() + view.getBottom()) / 2;

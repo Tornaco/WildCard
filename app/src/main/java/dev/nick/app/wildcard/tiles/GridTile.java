@@ -9,13 +9,13 @@ import dev.nick.app.wildcard.repo.SettingsProvider;
 import dev.nick.tiles.tile.QuickTile;
 import dev.nick.tiles.tile.SwitchTileView;
 
-public class GridTile extends QuickTile {
+class GridTile extends QuickTile {
 
-    public GridTile(@NonNull Context context) {
+    GridTile(@NonNull Context context) {
         super(context, null);
 
         this.titleRes = R.string.settings_grid;
-        this.iconRes = R.drawable.ic_menu_dash;
+        this.iconRes = R.drawable.ic_grid;
         this.tileView = new SwitchTileView(getContext()) {
 
             @Override

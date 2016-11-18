@@ -21,19 +21,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import dev.nick.app.pinlock.PinLockStub;
 import dev.nick.app.wildcard.app.AppCompat;
 import dev.nick.app.wildcard.bean.WildPackage;
 import dev.nick.app.wildcard.repo.SettingsProvider;
+import dev.nick.app.wildcard.service.SharedExecutor;
+import dev.nick.app.wildcard.tiles.GuardSwitcher;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
-public class NavigatorActivity extends TransactionSafeActivity {
+public class NavigatorActivity extends TransactionSafeActivity implements GuardSwitcher.Callback {
 
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1101;
 
@@ -44,6 +49,16 @@ public class NavigatorActivity extends TransactionSafeActivity {
 
     private WildcardApp mApp;
 
+    private DisplayMode mDisplayMode;
+
+    private Observer mSettingsObserver = new Observer() {
+        @Override
+        public void update(Observable observable, Object o) {
+            applyTheme();
+            setLayoutManager();
+        }
+    };
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +68,10 @@ public class NavigatorActivity extends TransactionSafeActivity {
         mApp = (WildcardApp) getApplication();
 
         setContentView(R.layout.activity_navogator);
+
+        applyTheme();
+
+        placeFragment(R.id.container, new GuardSwitcher(), null, true);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -82,17 +101,18 @@ public class NavigatorActivity extends TransactionSafeActivity {
     }
 
     private void onFabClick() {
-        PinLockStub.LockInfo info = new PinLockStub.LockInfo(getString(R.string.app_name),
-                ContextCompat.getDrawable(this, R.mipmap.ic_launcher));
+        PinLockStub.LockSettings info = new PinLockStub.LockSettings(
+                ContextCompat.getDrawable(this, R.mipmap.ic_launcher)
+                , null, getThemeColor(), false, false);
 
         PinLockStub stub = new PinLockStub(this, info, new PinLockStub.Listener() {
             @Override
-            public void onShown() {
+            public void onShown(PinLockStub.LockSettings settings) {
                 // None
             }
 
             @Override
-            public void onDismiss() {
+            public void onDismiss(PinLockStub.LockSettings lockInfo) {
                 startActivity(new Intent(getApplicationContext(), PackagePickerActivity.class));
             }
         });
@@ -153,7 +173,17 @@ public class NavigatorActivity extends TransactionSafeActivity {
             return;
         }
 
+        asyncLoadPackages();
+    }
+
+    private void asyncLoadPackages() {
         new AsyncTask<Void, Void, List<WildPackage>>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                findViewById(R.id.progress).setVisibility(View.VISIBLE);
+            }
 
             @Override
             protected List<WildPackage> doInBackground(Void... voids) {
@@ -163,28 +193,60 @@ public class NavigatorActivity extends TransactionSafeActivity {
             @Override
             protected void onPostExecute(List<WildPackage> wildPackages) {
                 super.onPostExecute(wildPackages);
+                findViewById(R.id.progress).setVisibility(View.GONE);
                 mAdapter.update(wildPackages);
             }
-        }.execute();
+        }.executeOnExecutor(SharedExecutor.get().getService());
     }
 
     protected void showWildPackageList() {
         mRecyclerView.setHasFixedSize(true);
-        boolean useGrid = SettingsProvider.get().gridView(getApplicationContext());
-        if (useGrid) {
-            mRecyclerView.setLayoutManager(
-                    new GridLayoutManager(getApplicationContext(),
-                            getResources().getInteger(R.integer.wildlist_num_columns),
-                            LinearLayoutManager.VERTICAL,
-                            false));
-        } else {
-            mRecyclerView.setLayoutManager(
-                    new LinearLayoutManager(getApplicationContext(),
-                            LinearLayoutManager.VERTICAL,
-                            false));
-        }
+        setLayoutManager();
         mAdapter = new Adapter();
         mRecyclerView.setAdapter(mAdapter);
+
+        SettingsProvider.get().addObserver(mSettingsObserver);
+    }
+
+    private void setLayoutManager() {
+
+        DisplayMode newMode = SettingsProvider.get().gridView(getApplicationContext())
+                ? DisplayMode.Grid : DisplayMode.List;
+
+        boolean reset = mDisplayMode == null || newMode != mDisplayMode;
+        mDisplayMode = newMode;
+
+        mLogger.debug("Reset layout:" + reset);
+
+        if (reset) {
+            boolean useGrid = mDisplayMode == DisplayMode.Grid;
+            if (useGrid) {
+                mRecyclerView.setLayoutManager(
+                        new GridLayoutManager(getApplicationContext(),
+                                getResources().getInteger(R.integer.wildlist_num_columns),
+                                LinearLayoutManager.VERTICAL,
+                                false));
+            } else {
+                mRecyclerView.setLayoutManager(
+                        new LinearLayoutManager(getApplicationContext(),
+                                LinearLayoutManager.VERTICAL,
+                                false));
+            }
+        }
+    }
+
+    @Override
+    public void onEnabled() {
+        // Noop
+    }
+
+    @Override
+    public void onDisabled() {
+        // Noop
+    }
+
+    private enum DisplayMode {
+        List, Grid;
     }
 
     static class TwoLinesViewHolder extends RecyclerView.ViewHolder {
@@ -236,6 +298,11 @@ public class NavigatorActivity extends TransactionSafeActivity {
             notifyItemRemoved(position);
         }
 
+        void clear() {
+            this.data.clear();
+            notifyDataSetChanged();
+        }
+
         public void add(WildPackage wildPackage, int position) {
             this.data.add(position, wildPackage);
             notifyItemInserted(position);
@@ -250,7 +317,22 @@ public class NavigatorActivity extends TransactionSafeActivity {
         @Override
         public void onBindViewHolder(final TwoLinesViewHolder holder, int position) {
             final WildPackage item = data.get(position);
-            holder.title.setText(item.getName());
+            if (SettingsProvider.get().gridView(getApplicationContext())) {
+                holder.title.setVisibility(View.GONE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnail.getLayoutParams();
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    holder.thumbnail.setLayoutParams(params);
+                }
+            } else {
+                holder.title.setVisibility(View.VISIBLE);
+                holder.title.setText(item.getName());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnail.getLayoutParams();
+                    params.removeRule(RelativeLayout.CENTER_HORIZONTAL);
+                    holder.thumbnail.setLayoutParams(params);
+                }
+            }
             holder.thumbnail.setImageDrawable(item.getIcon());
             holder.actionBtn.setVisibility(position == 0 ? View.VISIBLE : View.INVISIBLE);
             holder.itemView.setOnClickListener(new View.OnClickListener() {

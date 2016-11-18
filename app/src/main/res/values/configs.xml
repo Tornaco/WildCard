@@ -2,10 +2,20 @@
 <resources>
 
     <integer name="dashboard_num_columns">1</integer>
-    <integer name="wildlist_num_columns">2</integer>
+    <integer name="wildlist_num_columns">3</integer>
+    <integer name="guard_interval_normal">300</integer>
+    <integer name="guard_interval_low">500</integer>
+
+    <integer name="guard_timeout">120</integer>
+
+    <string-array name="sts">
+        <item>@string/sts_boot</item>
+        <item>@string/sts_screen_on</item>
+        <item>@string/sts_everytime</item>
+        <item>@string/sts_timeout</item>
+    </string-array>
 
     <string-array name="filter_ignore_list">
-
         <item>dev.nick.app.wildcard</item>
 
         <item>com.gd.mobicore.pa</item>
@@ -201,9 +211,9 @@
     </string-array>
 
     <string-array name="filter_suggestion_list">
-        <item>com.jingdong.app.mall</item>
         <item>com.eg.android.AlipayGphone</item>
         <item>com.alipay.security.mobile.authenticator</item>
+        <item>com.jingdong.app.mall</item>
         <item>com.immomo.momo</item>
         <item>com.tencent.mm</item>
         <item>com.tencent.mobileqq</item>

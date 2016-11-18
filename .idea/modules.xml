@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WildCard.iml" filepath="$PROJECT_DIR$/WildCard.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/htmlDialog/htmlDialog.iml" filepath="$PROJECT_DIR$/htmlDialog/htmlDialog.iml" />
       <module fileurl="file://$PROJECT_DIR$/lock/lock.iml" filepath="$PROJECT_DIR$/lock/lock.iml" />
       <module fileurl="file://$PROJECT_DIR$/logger/logger.iml" filepath="$PROJECT_DIR$/logger/logger.iml" />
       <module fileurl="file://$PROJECT_DIR$/pinlock/pinlock.iml" filepath="$PROJECT_DIR$/pinlock/pinlock.iml" />

@@ -7,21 +7,31 @@
     android:fitsSystemWindows="true"
     tools:context="dev.nick.app.wildcard.NavigatorActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/adview_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:orientation="vertical" />
 
-    </android.support.design.widget.AppBarLayout>
+        <include layout="@layout/common_container" />
 
-    <include layout="@layout/content_navogator" />
+        <include layout="@layout/content_navigator" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:indeterminate="true"
+        app:layout_anchorGravity="center_horizontal" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -29,6 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_white_24dp" />
+        app:srcCompat="@drawable/ic_add" />
 
 </android.support.design.widget.CoordinatorLayout>

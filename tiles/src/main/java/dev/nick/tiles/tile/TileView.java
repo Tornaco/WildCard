@@ -79,6 +79,8 @@ public class TileView extends FrameLayout implements View.OnClickListener {
     protected void onBindActionView(RelativeLayout container) {
     }
 
+
+
     public TextView getTitleTextView() {
         return mTitleTextView;
     }

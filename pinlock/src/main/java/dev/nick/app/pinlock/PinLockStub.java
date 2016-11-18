@@ -28,17 +28,14 @@ import static android.content.Context.WINDOW_SERVICE;
 
 public class PinLockStub implements VividDotListener {
 
-    private PreferenceHelper mPrefHelper;
-
     private RelativeLayout mPinLayout;
+    private Context mContext;
+    private PreferenceHelper mPrefHelper;
     private VividDot mDotArea;
     private TextView mTipView;
-    private ImageView mLogo;
     private String mLastInputPwd;
-
-    private Context mContext;
-
-    private LockInfo mInfo;
+    private LockSettings mInfo;
+    private int mColor;
     private Listener mListener;
 
     private View.OnClickListener mButtonClickListener = new View.OnClickListener() {
@@ -60,11 +57,19 @@ public class PinLockStub implements VividDotListener {
         }
     };
 
-    public PinLockStub(Context context, LockInfo info, Listener listener) {
+    public PinLockStub(Context context, LockSettings info, Listener listener) {
         this.mContext = context;
         this.mInfo = info;
+        this.mColor = info.color;
         this.mListener = listener;
         this.mPrefHelper = new PreferenceHelper(mContext);
+    }
+
+    public boolean isLocked() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return mPinLayout.isAttachedToWindow();
+        }
+        return mPinLayout.getWindowToken() != null;
     }
 
     private void initView() {
@@ -73,8 +78,10 @@ public class PinLockStub implements VividDotListener {
                     .inflate(R.layout.layout_pin_pad, null, false);
             mDotArea = getView(mPinLayout, R.id.dot_area);
             mTipView = getView(mPinLayout, R.id.tip_view);
-            mLogo = getView(mPinLayout, R.id.logo);
-            mLogo.setImageDrawable(mInfo.icon);
+            RelativeLayout displayLayout = getView(mPinLayout, R.id.display_layout);
+            displayLayout.setBackgroundColor(mColor);
+            ImageView logoView = getView(mPinLayout, R.id.logo);
+            logoView.setImageDrawable(mInfo.icon);
             mDotArea.setListener(this);
             // set mListener for all buttons ugly.
             getView(mPinLayout, R.id.digit_9).setOnClickListener(mButtonClickListener);
@@ -96,7 +103,7 @@ public class PinLockStub implements VividDotListener {
                 }
             });
         }
-        if (mPrefHelper.isPwdSet()) {
+        if (mPrefHelper.isFirstRunSetting()) {
             setTipText(R.string.tips_pin_choose, 0);
         } else {
             setTipText(R.string.tips_enter_pin, 0);
@@ -122,7 +129,7 @@ public class PinLockStub implements VividDotListener {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_TOAST,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
         final WindowManager windowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
         windowManager.addView(mPinLayout, params);
@@ -154,6 +161,10 @@ public class PinLockStub implements VividDotListener {
      */
     private synchronized void removePinView(boolean animate) {
         disableOkayBtn();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (!mPinLayout.isAttachedToWindow()) return;
+        }
+        if (mPinLayout.getWindowToken() == null) return;
         final WindowManager windowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
         if (animate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ViewAnimatorUtil.circularHide(mPinLayout, new Animator.AnimatorListener() {
@@ -165,7 +176,7 @@ public class PinLockStub implements VividDotListener {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     windowManager.removeView(mPinLayout);
-                    mListener.onDismiss();
+                    mListener.onDismiss(mInfo);
                 }
 
                 @Override
@@ -180,7 +191,7 @@ public class PinLockStub implements VividDotListener {
             });
         } else {
             windowManager.removeView(mPinLayout);
-            mListener.onDismiss();
+            mListener.onDismiss(mInfo);
         }
 
     }
@@ -195,7 +206,7 @@ public class PinLockStub implements VividDotListener {
             return;
         }
         Logger.i("onOkayClicked, input = " + input, getClass());
-        if (mPrefHelper.isPwdSet()) {
+        if (mPrefHelper.isFirstRunSetting()) {
             if (mLastInputPwd == null) {
                 mLastInputPwd = input;
                 mDotArea.clearDots();
@@ -208,11 +219,14 @@ public class PinLockStub implements VividDotListener {
                     onPinCodeSaved(input);
                     removePinView(true);
                 } else {
+                    setTipText(R.string.tips_pin_no_match, R.string.tips_pin_choose);
+                    mLastInputPwd = null;
+                    mDotArea.clearDots();
                     onPinNotMatch(input);
                 }
             }
         } else {
-            String pwd = mPrefHelper.getStoredPwd();
+            String pwd = getStoredPwd();
             if (input.equals(pwd)) {
                 mDotArea.clearDots();
                 onPinCorrectInternal();
@@ -251,7 +265,7 @@ public class PinLockStub implements VividDotListener {
     }
 
     private void onPinCorrect() {
-        unLock();
+        unLock(true);
     }
 
     /**
@@ -261,8 +275,6 @@ public class PinLockStub implements VividDotListener {
      */
     private void onPinNotMatch(String pin) {
         Logger.i("onPinNotMatch: " + pin, getClass());
-        setTipText(R.string.tips_pin_no_match, R.string.tips_pin_choose);
-        mLastInputPwd = null;
     }
 
     /**
@@ -270,7 +282,7 @@ public class PinLockStub implements VividDotListener {
      *
      * @param pin The pin that user give.
      */
-    private void onPinCodeError(String pin) {
+    protected void onPinCodeError(String pin) {
         mDotArea.setDisplayMode(VividDot.DisplayMode.Wrong, true);
         setTipText(R.string.tips_pin_wrong, R.string.tips_enter_pin);
     }
@@ -303,42 +315,46 @@ public class PinLockStub implements VividDotListener {
         getView(mPinLayout, R.id.okay).setEnabled(false);
     }
 
-    /**
-     * @return True if this activity is the "Launcher Activity" of Vault.
-     */
-    protected boolean isEntryActivity() {
-        return false;
-    }
 
     @SuppressWarnings("unchecked")
-    private <T extends View> T getView(View root, int id) {
+    protected <T extends View> T getView(View root, int id) {
         return (T) root.findViewById(id);
     }
 
     public void lock() {
         addPinView(false);
-        mListener.onShown();
+        mListener.onShown(mInfo);
     }
 
-    public void unLock() {
-        removePinView(true);
-        mListener.onDismiss();
+    public void unLock(boolean anim) {
+        removePinView(anim);
     }
 
     public interface Listener {
-        void onShown();
+        void onShown(LockSettings settings);
 
-        void onDismiss();
+        void onDismiss(LockSettings info);
     }
 
-    public static class LockInfo {
+    public static class LockSettings {
 
         Drawable icon;
-        String title;
+        String pkg;
 
-        public LockInfo(String title, Drawable icon) {
+        int color;
+        boolean hookBack;
+        boolean hookHome;
+
+        public LockSettings(Drawable icon, String pkg, int color, boolean hookBack, boolean hookHome) {
             this.icon = icon;
-            this.title = title;
+            this.pkg = pkg;
+            this.color = color;
+            this.hookBack = hookBack;
+            this.hookHome = hookHome;
+        }
+
+        public String getPkg() {
+            return pkg;
         }
     }
 }

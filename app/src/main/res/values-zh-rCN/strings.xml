@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">应用锁</string>
     <string name="action_settings">设置</string>
     <string name="action_remove">移除</string>
@@ -28,9 +28,44 @@
     <string name="tips_pin_confirm">确认您的密码</string>
     <string name="tips_pin_choose">设置密码</string>
 
+    <string name="color_picker_default_title" msgid="1248663997452044787">"选择颜色"</string>
+    <string name="color_swatch_description" msgid="2883438431173736180">"颜色 <xliff:g id="COLOR_INDEX">%1$d</xliff:g>"</string>
+    <string name="color_swatch_description_selected" msgid="5020921249944943124">"已选择颜色 <xliff:g id="COLOR_INDEX">%1$d</xliff:g>"</string>
+
     <string name="category_view">界面</string>
+    <string name="category_device">设备</string>
+    <string name="category_st">策略</string>
+    <string name="category_others">其他</string>
+    <string name="category_apps">已保护应用</string>
+    <string name="category_btn">按键</string>
+
+
+    <string name="settings_btn_back">屏蔽返回按键</string>
+    <string name="settings_btn_home">主页</string>
+
     <string name="settings_grid">网格视图</string>
+    <string name="settings_boot">开机启动</string>
+    <string name="settings_color">主题颜色</string>
+
+    <string name="title_enable">启用</string>
+
+    <string name="settings_power_save">省电模式</string>
+    <string name="summary_power_save">降低刷新率</string>
+    <string name="settings_timeout">超时</string>
+    <string name="settings_timeout_dialog_title">输入超时秒数</string>
+    <string name="settings_timeout_hint">%1$s秒</string>
+    <string name="settings_timeout_not_available">不可用</string>
+
+    <string name="settings_verify_st">需要验证</string>
+    <string name="sts_boot">重新启动</string>
+    <string name="sts_screen_on">屏幕熄灭</string>
+    <string name="sts_everytime">每次</string>
+    <string name="sts_timeout">超时后</string>
+
+    <string name="title_app_license">许可</string>
+    <string name="title_with_ad">无广告</string>
 
     <string name="title_get_status">应用权限说明</string>
+    <string name="summary_perm_require">如果您使用的是含广告的版本，为了显示广告我们需要获取您的位置和电话信息，如果您介意您可以选择拒绝，同样如果您允许了，稍后也可在设置中关闭</string>
     <string name="message_get_status">在Android5.1以后，我们需要读取您的应用使用情况来实现锁定功能，因此请您在稍后页面<b>有权查看使用情况</b>里面选择<b>应用锁</b></string>
 </resources>

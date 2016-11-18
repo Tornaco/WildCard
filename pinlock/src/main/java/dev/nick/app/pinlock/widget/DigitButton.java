@@ -22,27 +22,30 @@ public class DigitButton extends Button {
 
     public DigitButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        readKeyFromAttrs(context, attrs);
+        init(context, attrs);
     }
 
     public DigitButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        readKeyFromAttrs(context, attrs);
+        init(context, attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public DigitButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        readKeyFromAttrs(context, attrs);
+        init(context, attrs);
     }
 
-    private void readKeyFromAttrs(Context context, AttributeSet attrs) {
+    private void init(Context context, AttributeSet attrs) {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.pin);
         String keyStr = array.getString(R.styleable.pin_key);
         if (keyStr != null)
             mStandFor = SecurityUtils.text2PinKey(keyStr);
         array.recycle();
-        Logger.d("readKeyFromAttrs: key = " + mStandFor.toString(), getClass());
+
+        setSoundEffectsEnabled(true);
+
+        Logger.d("init: key = " + mStandFor.toString(), getClass());
     }
 
     public PinKey getPinKey() {
