@@ -10,10 +10,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/htmlDialog" />
+            <option value="$PROJECT_DIR$/eventbus" />
+            <option value="$PROJECT_DIR$/htmldialog" />
             <option value="$PROJECT_DIR$/lock" />
             <option value="$PROJECT_DIR$/logger" />
             <option value="$PROJECT_DIR$/pinlock" />
+            <option value="$PROJECT_DIR$/scalpel" />
             <option value="$PROJECT_DIR$/tiles" />
           </set>
         </option>

@@ -40,6 +40,8 @@
     <string name="category_btn">按键</string>
 
 
+    <string name="settings_compat_mode">兼容模式</string>
+    <string name="summary_compat_mode">实验功能!!!</string>
     <string name="settings_btn_back">屏蔽返回按键</string>
     <string name="settings_btn_home">主页</string>
 
@@ -57,13 +59,29 @@
     <string name="settings_timeout_not_available">不可用</string>
 
     <string name="settings_verify_st">需要验证</string>
+    <string name="category_secure">密码</string>
     <string name="sts_boot">重新启动</string>
     <string name="sts_screen_on">屏幕熄灭</string>
     <string name="sts_everytime">每次</string>
     <string name="sts_timeout">超时后</string>
+    <string name="settings_pwd_complex">复杂密码</string>
+    <string name="settings_pwd_reset">重设密码</string>
 
     <string name="title_app_license">许可</string>
     <string name="title_with_ad">无广告</string>
+
+
+    <string name="title_pwd_set">设置密保问题</string>
+    <string name="title_pwd_reset">重设密码</string>
+    <string name="title_question">您的问题</string>
+    <string name="title_answern">输入答案</string>
+    <string name="title_complete">完成</string>
+    <string name="title_start">开始</string>
+
+    <string name="q_err_invalid">该问题非法</string>
+    <string name="a_err_invalid">该答案非法</string>
+
+    <string name="incorrect_a">答案错误</string>
 
     <string name="title_get_status">应用权限说明</string>
     <string name="summary_perm_require">如果您使用的是含广告的版本，为了显示广告我们需要获取您的位置和电话信息，如果您介意您可以选择拒绝，同样如果您允许了，稍后也可在设置中关闭</string>

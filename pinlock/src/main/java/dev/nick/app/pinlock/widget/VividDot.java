@@ -21,6 +21,7 @@ import dev.nick.app.pinlock.secure.PinKey;
 import dev.nick.app.pinlock.secure.VividDotListener;
 import dev.nick.app.pinlock.utils.Lists;
 import dev.nick.app.pinlock.utils.Logger;
+import dev.nick.app.pinlock.utils.PreferenceHelper;
 import dev.nick.app.pinlock.utils.ViewAnimatorUtil;
 
 /**
@@ -70,6 +71,7 @@ public class VividDot extends View {
         mDotPadding = array.getDimensionPixelSize(R.styleable.dot_padding, 30);
         int shadowRadius = array.getDimensionPixelSize(R.styleable.dot_shadowSize, 3);
         mMaxDotCount = array.getInteger(R.styleable.dot_count, 4);
+        mMaxDotCount = new PreferenceHelper(context).complexPwd() ? 6 : 4;
         array.recycle();
 
         mDotPaint = new Paint();

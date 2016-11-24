@@ -54,5 +54,16 @@
             android:text="@string/tips_enter_pin"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/help"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/common_vertical_margin"
+            android:src="@drawable/ic_help"
+            android:tint="@color/white" />
     </RelativeLayout>
 </RelativeLayout>

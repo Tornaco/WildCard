@@ -22,12 +22,16 @@ public class SettingsDashboards extends DashboardFragment {
         device.titleRes = R.string.category_device;
         device.addTile(new PowerSaveTile(getContext()));
         device.addTile(new BootTile(getContext()));
-        device.addTile(new BackTile(getContext()));
+
+        Category secure = new Category();
+        secure.titleRes = R.string.category_secure;
+        secure.addTile(new ComplexPwdTile(getContext()));
 
         Category strategy = new Category();
         strategy.titleRes = R.string.category_st;
         strategy.addTile(new StrategyTile(getContext()));
         strategy.addTile(new TimeoutTile(getContext()));
+        strategy.addTile(new CompatTile(getContext()));
 
         Category others = new Category();
         others.titleRes = R.string.category_others;
@@ -35,6 +39,7 @@ public class SettingsDashboards extends DashboardFragment {
 
         categories.add(view);
         categories.add(device);
+        //categories.add(secure);
         categories.add(strategy);
         categories.add(others);
     }

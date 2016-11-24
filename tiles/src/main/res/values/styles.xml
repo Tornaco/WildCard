@@ -43,4 +43,9 @@
         <item name="colorButtonNormal">?attr/colorAccent</item>
     </style>
 
+    <style name="ActionArea" parent="Theme.AppCompat.Light">
+        <!-- Used by controls, e.g. CheckBox, ProgressBar, etc. -->
+        <item name="colorAccent">?attr/colorPrimary</item>
+    </style>
+
 </resources>

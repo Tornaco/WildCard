@@ -15,4 +15,17 @@
     <string name="tips_pin_no_match">Pins do not match</string>
     <string name="tips_pin_confirm">Confirm your pin</string>
     <string name="tips_pin_choose">Choose your pin</string>
+
+    <string name="title_pwd_set">Secure question setup</string>
+    <string name="title_pwd_reset">Reset passcode</string>
+
+    <string name="title_question">Question</string>
+    <string name="title_answern">Answer</string>
+    <string name="title_complete">Complete</string>
+    <string name="title_start">Start</string>
+
+    <string name="incorrect_a">Incorrect answer</string>
+
+    <string name="q_err_invalid">Invalid question</string>
+    <string name="a_err_invalid">Invalid anwser</string>
 </resources>

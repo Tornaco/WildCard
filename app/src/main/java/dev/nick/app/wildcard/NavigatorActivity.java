@@ -24,16 +24,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.nick.scalpel.core.opt.SharedExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import dev.nick.app.pinlock.PinLockStub;
+import dev.nick.app.pinlock.PwdSetter;
 import dev.nick.app.wildcard.app.AppCompat;
 import dev.nick.app.wildcard.bean.WildPackage;
+import dev.nick.app.wildcard.camera.SpyPinLock;
 import dev.nick.app.wildcard.repo.SettingsProvider;
-import dev.nick.app.wildcard.service.SharedExecutor;
 import dev.nick.app.wildcard.tiles.GuardSwitcher;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -85,6 +88,39 @@ public class NavigatorActivity extends TransactionSafeActivity implements GuardS
         });
 
         showWildPackageList();
+
+        showLock();
+    }
+
+    private void showLock() {
+        PinLockStub.LockSettings settings = new PinLockStub.LockSettings(
+                ContextCompat.getDrawable(this, R.mipmap.ic_launcher), getPackageName(), getThemeColor()
+                , false, false);
+
+        PinLockStub locker = new SpyPinLock(getApplicationContext(), settings, new PinLockStub.Listener() {
+            @Override
+            public void onShown(PinLockStub.LockSettings settings) {
+
+            }
+
+            @Override
+            public void onDismiss(PinLockStub.LockSettings info) {
+
+            }
+        });
+
+        if (TextUtils.isEmpty(locker.getStoredPwd())) return;
+
+        boolean mCompatMode = SettingsProvider.get().compatMode(this);
+        if (!mCompatMode) {
+            locker.lock();
+        } else {
+            Intent intent = new Intent(this, LockProxyActivity.class);
+            intent.putExtra("pkg", getPackageName());
+            intent.putExtra("color", getThemeColor());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
 
     private boolean hasUsagePermission() {
@@ -105,7 +141,7 @@ public class NavigatorActivity extends TransactionSafeActivity implements GuardS
                 ContextCompat.getDrawable(this, R.mipmap.ic_launcher)
                 , null, getThemeColor(), false, false);
 
-        PinLockStub stub = new PinLockStub(this, info, new PinLockStub.Listener() {
+        PinLockStub stub = new SpyPinLock(this, info, new PinLockStub.Listener() {
             @Override
             public void onShown(PinLockStub.LockSettings settings) {
                 // None
@@ -118,7 +154,7 @@ public class NavigatorActivity extends TransactionSafeActivity implements GuardS
         });
         boolean hasPwd = !TextUtils.isEmpty(stub.getStoredPwd());
         if (!hasPwd) {
-            stub.lock();
+            startActivity(new Intent(getApplicationContext(), PwdSetter.class));
         } else {
             startActivity(new Intent(getApplicationContext(), PackagePickerActivity.class));
         }

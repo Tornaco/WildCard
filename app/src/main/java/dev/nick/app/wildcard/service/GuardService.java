@@ -10,6 +10,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -22,12 +23,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.app.pinlock.PinLockStub;
+import dev.nick.app.wildcard.EventDefination;
+import dev.nick.app.wildcard.LockProxyActivity;
 import dev.nick.app.wildcard.WildcardApp;
 import dev.nick.app.wildcard.app.AppCompat;
 import dev.nick.app.wildcard.bean.WildPackage;
 import dev.nick.app.wildcard.camera.SpyPinLock;
 import dev.nick.app.wildcard.repo.IProviderService;
 import dev.nick.app.wildcard.repo.SettingsProvider;
+import dev.nick.eventbus.Event;
+import dev.nick.eventbus.EventBus;
+import dev.nick.eventbus.EventReceiver;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
@@ -41,6 +47,7 @@ public class GuardService extends Service implements PinLockStub.Listener {
     private String mLastLockingPackage = "anyone";
 
     private Handler mHandler = null;
+
     private Handler mUIThreadHandler;
 
     private AtomicBoolean mLastLockingKeeping = new AtomicBoolean(false);
@@ -59,7 +66,10 @@ public class GuardService extends Service implements PinLockStub.Listener {
 
     private PinLockStub mLocker;
 
+    private boolean mCompatMode = true;
+
     private BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) {
@@ -98,6 +108,18 @@ public class GuardService extends Service implements PinLockStub.Listener {
         mLogger = LoggerManager.getLogger(getClass());
 
         mLogger.debug("Bring up!");
+
+        EventBus.from(this).subscribe(new EventReceiver() {
+            @Override
+            public void onReceive(@NonNull Event event) {
+                onVerifySuccess(event);
+            }
+
+            @Override
+            public int[] events() {
+                return new int[]{EventDefination.EVENT_VERIFY_SUCCESS};
+            }
+        });
 
         readWorkingPackages();
 
@@ -159,12 +181,20 @@ public class GuardService extends Service implements PinLockStub.Listener {
                         return;
                     }
 
-                    PinLockStub.LockSettings settings = new PinLockStub.LockSettings(
-                            wildPackage.getIcon(), wildPackage.getPkgName(), mThemeColor
-                            , hookBack, hookHome);
+                    if (!mCompatMode) {
+                        PinLockStub.LockSettings settings = new PinLockStub.LockSettings(
+                                wildPackage.getIcon(), wildPackage.getPkgName(), mThemeColor
+                                , hookBack, hookHome);
 
-                    mLocker = new SpyPinLock(getApplicationContext(), settings, GuardService.this);
-                    mLocker.lock();
+                        mLocker = new SpyPinLock(getApplicationContext(), settings, GuardService.this);
+                        mLocker.lock();
+                    } else {
+                        Intent intent = new Intent(this, LockProxyActivity.class);
+                        intent.putExtra("pkg", pkgName);
+                        intent.putExtra("color", mThemeColor);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
             }
         }
@@ -177,12 +207,25 @@ public class GuardService extends Service implements PinLockStub.Listener {
         hookBack = provider.backHooked(this);
         hookHome = provider.homeHooked(this);
         mEnabled = provider.enabled(this);
+        mCompatMode = provider.compatMode(this);
 
-        mLogger.debug("Service interval:" + mServiceInterval);
+        mLogger.info("Settings:" + dumpSettings());
 
         if (!mEnabled) {
             stopSelf();
         }
+    }
+
+    public String dumpSettings() {
+        return "GuardService{" +
+                "hookHome=" + hookHome +
+                ", hookBack=" + hookBack +
+                ", mEnabled=" + mEnabled +
+                ", mScreenOn=" + mScreenOn +
+                ", mServiceInterval=" + mServiceInterval +
+                ", mThemeColor=" + mThemeColor +
+                ", mCompatMode=" + mCompatMode +
+                '}';
     }
 
     private void readWorkingPackages() {
@@ -202,19 +245,23 @@ public class GuardService extends Service implements PinLockStub.Listener {
 
         mLogger.verbose(packageName);
 
+        if (getPackageName().equals(packageName)) {
+            return null;
+        }
+
         if (!"com.google.android.packageinstaller".equals(packageName)
                 && !"com.android.packageinstaller".equals(packageName)
                 && !mLastLockingPackage.equals(packageName)) {
             mLastLockingKeeping.set(false);
-            onLockingPkgHidden();
+            if (!mCompatMode) {
+                onLockingPkgHidden();
+            }
         }
 
         if (TextUtils.isEmpty(packageName)) {
             return null;
         }
 
-        WildPackage wildPackage = new WildPackage();
-        wildPackage.setPkgName(packageName);
         return (mWorkingList.get(packageName) != null ? packageName : null);
     }
 
@@ -241,6 +288,14 @@ public class GuardService extends Service implements PinLockStub.Listener {
         mHandler.removeCallbacksAndMessages(null);
         unregisterReceiver(mScreenReceiver);
         mLogger.debug("Shutting down!");
+    }
+
+    //    @ReceiverMethod
+//    @Events({EventDefination.EVENT_VERIFY_SUCCESS})
+    public void onVerifySuccess(Event event) {
+        String pkg = event.getData().getString("pkg");
+        mLogger.debug(pkg);
+        mSessionManager.setVerified(pkg);
     }
 
     @Override
@@ -287,9 +342,6 @@ public class GuardService extends Service implements PinLockStub.Listener {
                 mVerifyStrategy.set(strategy);
             }
             mTimeoutMills = SettingsProvider.get().sessionTimeout(context) * 1000;
-
-            mLogger.debug("mVerifyStrategy:" + mVerifyStrategy.get()
-                    + ", mTimeoutMills:" + mTimeoutMills);
         }
 
         private void onVerifyStrategyChange() {

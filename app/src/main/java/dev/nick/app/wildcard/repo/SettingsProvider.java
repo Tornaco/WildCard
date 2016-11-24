@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat;
 
 import java.util.Observable;
 
+import dev.nick.app.pinlock.utils.PreferenceHelper;
 import dev.nick.app.wildcard.R;
 
 public abstract class SettingsProvider extends Observable {
@@ -55,6 +56,14 @@ public abstract class SettingsProvider extends Observable {
 
     public abstract void setHomeHooked(Context context, boolean value);
 
+    public abstract boolean compatMode(Context context);
+
+    public abstract void setCompatMode(Context context, boolean value);
+
+    public abstract boolean complexPwd(Context context);
+
+    public abstract void setComplexPwe(Context context, boolean value);
+
     public interface NeedVerifyAfter {
         int BOOT = 0;
         int SCREEN_ON = 1;
@@ -73,7 +82,8 @@ public abstract class SettingsProvider extends Observable {
         private static final String KEY_THEME_COLOR = "settings.theme.color";
         private static final String KEY_HOOK_KEY_BACK = "settings.key.hook.back";
         private static final String KEY_HOOK_KEY_HOME = "settings.key.hook.home";
-
+        private static final String KEY_COMPAT_MODE = "settings.key.compat";
+        private static final String KEY_COMPLEX_PWD = "settings.pwd.complex";
 
         @Override
         public boolean enabled(Context context) {
@@ -93,7 +103,7 @@ public abstract class SettingsProvider extends Observable {
         @Override
         public boolean gridView(Context context) {
             return PreferenceManager.getDefaultSharedPreferences(context)
-                    .getBoolean(KEY_GRID_VIEW, false);
+                    .getBoolean(KEY_GRID_VIEW, true);
         }
 
         @Override
@@ -130,7 +140,7 @@ public abstract class SettingsProvider extends Observable {
         @Override
         public int verifyStrategy(Context context) {
             return PreferenceManager.getDefaultSharedPreferences(context)
-                    .getInt(KEY_GUARD_STRATEGY, NeedVerifyAfter.EVERY_TIME);
+                    .getInt(KEY_GUARD_STRATEGY, NeedVerifyAfter.SCREEN_ON);
         }
 
         @Override
@@ -161,7 +171,7 @@ public abstract class SettingsProvider extends Observable {
         @Override
         public boolean startOnBoot(Context context) {
             return PreferenceManager.getDefaultSharedPreferences(context)
-                    .getBoolean(KEY_START_ON_BOOT, true);
+                    .getBoolean(KEY_START_ON_BOOT, false);
         }
 
         @Override
@@ -175,7 +185,7 @@ public abstract class SettingsProvider extends Observable {
         public int themeColor(Context context) {
             return PreferenceManager.getDefaultSharedPreferences(context)
                     .getInt(KEY_THEME_COLOR,
-                            ContextCompat.getColor(context, R.color.primary));
+                            ContextCompat.getColor(context, R.color.accent));
         }
 
         @Override
@@ -211,6 +221,37 @@ public abstract class SettingsProvider extends Observable {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .edit().putBoolean(KEY_HOOK_KEY_HOME, value)
                     .apply();
+        }
+
+        @Override
+        public boolean compatMode(Context context) {
+            return PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean(KEY_COMPAT_MODE, true);
+        }
+
+        @Override
+        public void setCompatMode(Context context, boolean value) {
+            PreferenceManager.getDefaultSharedPreferences(context)
+                    .edit().putBoolean(KEY_COMPAT_MODE, value)
+                    .apply();
+            setChanged();
+            notifyObservers(KEY_COMPAT_MODE);
+        }
+
+        @Override
+        public boolean complexPwd(Context context) {
+            return PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean(KEY_COMPLEX_PWD, true);
+        }
+
+        @Override
+        public void setComplexPwe(Context context, boolean value) {
+            PreferenceManager.getDefaultSharedPreferences(context)
+                    .edit().putBoolean(KEY_COMPLEX_PWD, value)
+                    .apply();
+            new PreferenceHelper(context).setComplexPwd(value);
+            setChanged();
+            notifyObservers(KEY_COMPLEX_PWD);
         }
     }
 }

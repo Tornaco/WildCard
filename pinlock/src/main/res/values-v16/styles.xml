@@ -13,4 +13,5 @@
                 <item name="android:textAllCaps">false</item>
                 <item name="android:textColor">#000</item>
         </style>
+
 </resources>

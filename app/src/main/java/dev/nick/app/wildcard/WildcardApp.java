@@ -2,6 +2,7 @@ package dev.nick.app.wildcard;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import dev.nick.app.wildcard.bean.WildPackage;
@@ -13,19 +14,18 @@ import dev.nick.logger.LoggerManager;
 
 public class WildcardApp extends Application {
 
-    private static WildcardApp sApp;
     private IProviderService<WildPackage> mProviderService;
 
-    public static WildcardApp get() {
-        return sApp;
-    }
+    private Handler mHandler;
 
     @Override
     public void onCreate() {
         super.onCreate();
         LoggerManager.setDebugLevel(Log.DEBUG);
         LoggerManager.setTagPrefix("WildcardApp");
-        sApp = this;
+
+        mHandler = new Handler();
+
         mProviderService = new ProviderService(this);
         mProviderService.observe(new IProviderService.Observer() {
             @Override
@@ -36,6 +36,10 @@ public class WildcardApp extends Application {
         if (SettingsProvider.get().enabled(this)) {
             startService(new Intent(this, GuardService.class));
         }
+    }
+
+    public Handler getHandler() {
+        return mHandler;
     }
 
     public IProviderService<WildPackage> getProviderService() {

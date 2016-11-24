@@ -13,12 +13,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 
+import com.nick.scalpel.core.opt.SharedExecutor;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import dev.nick.app.wildcard.bean.WildPackage;
-import dev.nick.app.wildcard.service.SharedExecutor;
 import dev.nick.app.wildcard.tiles.PickerDashboards;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;

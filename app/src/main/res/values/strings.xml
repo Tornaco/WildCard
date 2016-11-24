@@ -16,12 +16,18 @@
 
     <string name="category_view">UI</string>
     <string name="category_device">Device</string>
+    <string name="category_secure">Passcode</string>
     <string name="category_st">Strategy</string>
     <string name="category_others">Others</string>
     <string name="category_apps">Protected apps</string>
     <string name="category_btn">Buttons</string>
 
 
+    <string name="settings_pwd_complex">Complex passcode</string>
+    <string name="settings_pwd_reset">Reset passcode</string>
+
+    <string name="settings_compat_mode">Compat mode</string>
+    <string name="summary_compat_mode">Experiment!!!</string>
     <string name="settings_btn_back">Hook BACK</string>
     <string name="settings_btn_home">Home</string>
     <string name="settings_grid">Grid view</string>
